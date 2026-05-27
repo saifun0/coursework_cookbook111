@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кулинарная книга и Генератор рецептов</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Иконки -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-utensils"></i>
+                <span>Рецепты</span>
+            </a>
+            
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Найти рецепт...">
+                <button id="search-btn"><i class="fa-solid fa-search"></i></button>
+            </div>
+
+            <div class="header-controls">
+                <button id="theme-toggle" class="btn-icon" title="Переключить тему">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <button id="favorites-btn" class="btn-icon" title="Избранное">
+                    <i class="fa-solid fa-heart"></i>
+                    <span id="fav-count" class="badge">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <aside class="sidebar">
+            <h3>Категории</h3>
+            <ul class="filter-list" id="category-filters">
+                <li><button class="filter-btn active" data-filter="all">Все рецепты</button></li>
+                <li><button class="filter-btn" data-filter="breakfast">Завтраки</button></li>
+                <li><button class="filter-btn" data-filter="lunch">Обеды</button></li>
+                <li><button class="filter-btn" data-filter="dinner">Ужины</button></li>
+                <li><button class="filter-btn" data-filter="favorites">Избранное</button></li>
+            </ul>
+        </aside>
+
+        <section class="recipes-section">
+            <div class="section-header">
+                <h2 id="section-title">Все рецепты</h2>
+                <button id="random-btn" class="btn-primary">
+                    <i class="fa-solid fa-dice"></i> Случайный рецепт
+                </button>
+            </div>
+            
+            <div id="recipes-grid" class="recipes-grid">
+                <!-- Карточки будут добавлены через JS -->
+            </div>
+            
+            <div id="no-results" class="no-results hidden">
+                <i class="fa-solid fa-ghost"></i>
+                <p>К сожалению, по вашему запросу ничего не найдено.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Модальное окно для рецепта -->
+    <div id="recipe-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <div class="modal-body" id="modal-body">
+                <!-- Контент модального окна -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной скрипт -->
+    <script src="script.js"></script>
+</body>
+</html>
