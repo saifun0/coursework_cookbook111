@@ -61,3 +61,104 @@ const recipes = [
     }
 ];
 
+// Элементы DOM
+const recipesGrid = document.getElementById('recipes-grid');
+const searchInput = document.getElementById('search-input');
+const categoryFilters = document.querySelectorAll('.filter-btn');
+const sectionTitle = document.getElementById('section-title');
+const noResults = document.getElementById('no-results');
+const randomBtn = document.getElementById('random-btn');
+const favCount = document.getElementById('fav-count');
+const headerFavBtn = document.getElementById('favorites-btn');
+
+// Модальное окно
+const modal = document.getElementById('recipe-modal');
+const modalBody = document.getElementById('modal-body');
+const closeBtn = document.querySelector('.close-btn');
+
+// Тема
+const themeToggle = document.getElementById('theme-toggle');
+
+// Состояние приложения
+let currentFilter = 'all';
+let searchQuery = '';
+let favorites = JSON.parse(localStorage.getItem('recipeFavorites')) || [];
+
+// Инициализация
+function init() {
+    updateFavCount();
+    renderRecipes(recipes);
+    initTheme();
+
+    // Слушатели событий
+    searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase();
+        applyFilters();
+    });
+
+    categoryFilters.forEach(btn => {
+        btn.addEventListener('click', () => {
+            categoryFilters.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            
+            sectionTitle.textContent = btn.textContent;
+            applyFilters();
+        });
+    });
+
+    randomBtn.addEventListener('click', showRandomRecipe);
+    
+    closeBtn.addEventListener('click', closeModal);
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    themeToggle.addEventListener('click', toggleTheme);
+
+    headerFavBtn.addEventListener('click', () => {
+        const favFilterBtn = document.querySelector('.filter-btn[data-filter="favorites"]');
+        if (favFilterBtn) favFilterBtn.click();
+        
+        // Для мобилок, если нужно будет скроллить к рецептам
+        window.scrollTo({ top: document.querySelector('.recipes-section').offsetTop - 100, behavior: 'smooth' });
+    });
+
+    // Делегирование событий для сетки рецептов
+    recipesGrid.addEventListener('click', (e) => {
+        // Проверяем клик по кнопке "Избранное"
+        const favBtn = e.target.closest('.btn-fav');
+        if (favBtn) {
+            const card = e.target.closest('.recipe-card');
+            if (card) {
+                const id = parseInt(card.dataset.id);
+                toggleFavorite(id, favBtn);
+            }
+            return;
+        }
+
+        // Проверяем клик по карточке для открытия модалки
+        const card = e.target.closest('.recipe-card');
+        if (card) {
+            const id = parseInt(card.dataset.id);
+            openRecipe(id);
+        }
+    });
+}
+
+// Отрисовка рецептов
+function renderRecipes(recipesToRender) {
+    recipesGrid.innerHTML = '';
+    
+    if (recipesToRender.length === 0) {
+        recipesGrid.classList.add('hidden');
+        noResults.classList.remove('hidden');
+        return;
+    }
+
+    recipesGrid.classList.remove('hidden');
+    noResults.classList.add('hidden');
+
+    recipesToRender.forEach(recipe => {
+        const isFav = favorites.includes(recipe.id);
+        const card = document.createElement('div');
