@@ -162,3 +162,49 @@ function renderRecipes(recipesToRender) {
     recipesToRender.forEach(recipe => {
         const isFav = favorites.includes(recipe.id);
         const card = document.createElement('div');
+        card.className = 'recipe-card';
+        card.dataset.id = recipe.id;
+        card.innerHTML = `
+            <img src="${recipe.image}" alt="${recipe.title}" class="recipe-img">
+            <div class="recipe-content">
+                <h3 class="recipe-title">${recipe.title}</h3>
+                <div class="recipe-meta">
+                    <span><i class="fa-regular fa-clock"></i> ${recipe.time}</span>
+                    <span>${getCategoryName(recipe.category)}</span>
+                </div>
+                <p class="recipe-desc">${recipe.description}</p>
+                <div class="recipe-actions">
+                    <button class="btn-outline">Смотреть</button>
+                    <button class="btn-fav ${isFav ? 'active' : ''}">
+                        <i class="fa-solid fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        recipesGrid.appendChild(card);
+    });
+}
+
+// Применение фильтров и поиска
+function applyFilters() {
+    let filtered = recipes;
+
+    // Фильтр по категории
+    if (currentFilter === 'favorites') {
+        filtered = filtered.filter(r => favorites.includes(r.id));
+    } else if (currentFilter !== 'all') {
+        filtered = filtered.filter(r => r.category === currentFilter);
+    }
+
+    // Фильтр по поиску
+    if (searchQuery) {
+        filtered = filtered.filter(r => 
+            r.title.toLowerCase().includes(searchQuery) || 
+            r.ingredients.some(i => i.toLowerCase().includes(searchQuery))
+        );
+    }
+
+    renderRecipes(filtered);
+}
+
+// Избранное
