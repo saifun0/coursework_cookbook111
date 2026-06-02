@@ -208,3 +208,123 @@ function applyFilters() {
 }
 
 // Избранное
+function toggleFavorite(id, btnElement) {
+    const index = favorites.indexOf(id);
+    if (index === -1) {
+        favorites.push(id);
+        btnElement.classList.add('active');
+    } else {
+        favorites.splice(index, 1);
+        btnElement.classList.remove('active');
+        // Если мы на вкладке "Избранное", сразу убираем карточку
+        if (currentFilter === 'favorites') {
+            applyFilters();
+        }
+    }
+    
+    localStorage.setItem('recipeFavorites', JSON.stringify(favorites));
+    updateFavCount();
+}
+
+function updateFavCount() {
+    favCount.textContent = favorites.length;
+}
+
+// Случайный рецепт
+function showRandomRecipe() {
+    const randomIndex = Math.floor(Math.random() * recipes.length);
+    openRecipe(recipes[randomIndex].id);
+}
+
+// Открытие модального окна
+function openRecipe(id) {
+    const recipe = recipes.find(r => r.id === id);
+    if (!recipe) return;
+
+    const isFav = favorites.includes(recipe.id);
+
+    modalBody.innerHTML = `
+        <img src="${recipe.image}" alt="${recipe.title}" class="modal-header-img">
+        <div class="modal-title-row">
+            <h2>${recipe.title}</h2>
+            <button class="btn-fav ${isFav ? 'active' : ''}" onclick="toggleFavoriteModal(${recipe.id}, this)">
+                <i class="fa-solid fa-heart"></i>
+            </button>
+        </div>
+        <div class="recipe-meta">
+            <span><i class="fa-regular fa-clock"></i> Время: ${recipe.time}</span>
+            <span>Категория: ${getCategoryName(recipe.category)}</span>
+        </div>
+        <p>${recipe.description}</p>
+        
+        <div class="modal-lists">
+            <div class="ingredients">
+                <h4>Ингредиенты</h4>
+                <ul>
+                    ${recipe.ingredients.map(ing => `<li>${ing}</li>`).join('')}
+                </ul>
+            </div>
+            <div class="instructions">
+                <h4>Приготовление</h4>
+                <ol>
+                    ${recipe.instructions.map(inst => `<li>${inst}</li>`).join('')}
+                </ol>
+            </div>
+        </div>
+    `;
+
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden'; // Запрет прокрутки фона
+}
+
+function closeModal() {
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+// Для переключения избранного внутри модалки
+window.toggleFavoriteModal = function(id, btnElement) {
+    toggleFavorite(id, btnElement);
+    // Обновляем кнопку на главной странице, если она видна
+    applyFilters();
+};
+
+// Вспомогательная функция
+function getCategoryName(cat) {
+    const names = {
+        'breakfast': 'Завтрак',
+        'lunch': 'Обед',
+        'dinner': 'Ужин'
+    };
+    return names[cat] || cat;
+}
+
+// Тема
+function initTheme() {
+    const savedTheme = localStorage.getItem('recipeTheme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('recipeTheme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const icon = themeToggle.querySelector('i');
+    if (theme === 'dark') {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+    } else {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+    }
+}
+
+// Запуск
+document.addEventListener('DOMContentLoaded', init);
